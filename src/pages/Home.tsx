@@ -4,6 +4,7 @@ import Features from '@/components/Features.tsx'
 import autoTemp from '../../assets/images/autoTemp.jpg'
 
 export default function Home() {
+  // TODO: fix
   const data = [
     {
       title: 'Model X',

@@ -1,7 +1,15 @@
-type StudentResponse = {
-  id: string
-  name: string
-  email: string
-  dob: string
-  age: number
+type CarDataProps = {
+  id?: number
+  brand: string
+  model: string
+  year: number
+  description: string
+}
+
+type CarResponse = {
+  id: number
+  brand: string
+  model: string
+  year: number
+  description: string
 }

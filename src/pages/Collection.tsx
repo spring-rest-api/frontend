@@ -1,14 +1,15 @@
 import Showcase from '@/components/Showcase.tsx'
-import useStudentsData from '@/hooks/useStudentsData.ts'
+import getCarsData from '@/lib/getCarsData.ts'
 
 export default function Collection() {
-  const { isLoading, isError, students } = useStudentsData()
+  const { isLoading, isError, cars } = getCarsData()
 
+  console.log('DATA', cars)
   return (
     <>
       {isLoading ? <div>Loading...</div> : null}
       {isError ? <div>Error</div> : null}
-      {students ? <Showcase data={students} /> : <div>No response data</div>}
+      {cars ? <Showcase data={cars} /> : <div>No response data</div>}
     </>
   )
 }

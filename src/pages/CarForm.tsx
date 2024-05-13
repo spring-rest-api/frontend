@@ -3,12 +3,30 @@ import { Input } from '@/components/ui/input.tsx'
 import { Textarea } from '@/components/ui/textarea.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
+import { api } from '@/api/axios.ts'
+import { useRef, useState } from 'react'
 
 export default function CarForm() {
+  const [message, setMessage] = useState<string | null>(null)
   const { register, handleSubmit } = useForm()
+  const ref = useRef<HTMLFormElement>(null)
 
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    console.log(data)
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    try {
+      ref.current?.reset()
+      const newCarData: CarDataProps = {
+        model: data.model,
+        brand: data.brand,
+        description: data.description,
+        year: parseInt(data.year, 10),
+      }
+      await api.post('/api/v1/car', newCarData)
+      setMessage('Car added')
+    } catch (error) {
+      console.log(error)
+      // @ts-ignore
+      setMessage(error.response.data.message)
+    }
   }
 
   return (
@@ -20,11 +38,14 @@ export default function CarForm() {
             Fill in the form and create your dream car
           </p>
         </div>
-        {/*{errors ? (*/}
-        {/*  <div className="text-red-600 text-center">Some error</div>*/}
-        {/*) : null}*/}
-        {/*{isSubmitted ? <div>Submitted</div> : null}*/}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {message ? (
+          <div
+            className={`text-center ${message === 'Car added' ? 'text-green-600' : 'text-red-600'}`}
+          >
+            {message}
+          </div>
+        ) : null}
+        <form ref={ref} onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="brand">Brand</Label>
@@ -54,21 +75,13 @@ export default function CarForm() {
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="subject">Color</Label>
-            <Input
-              {...register('color')}
-              id="color"
-              placeholder="Enter car color"
-              required
-            />
-          </div>
+
           <div className="space-y-2">
             <Label htmlFor="message">Description (optional)</Label>
             <Textarea
-              {...register('desc')}
+              {...register('description')}
               className="min-h-[100px]"
-              id="desc"
+              id="description"
               placeholder="Describe the car"
             />
           </div>
