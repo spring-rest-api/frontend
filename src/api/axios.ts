@@ -8,3 +8,7 @@ export const api = axios.create({
     'Content-Type': 'application/json',
   },
 })
+
+export const imageApi = axios.create({
+  baseURL: '',
+})

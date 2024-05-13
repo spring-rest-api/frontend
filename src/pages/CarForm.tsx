@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input.tsx'
 import { Textarea } from '@/components/ui/textarea.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { FieldValues, SubmitHandler, useForm } from 'react-hook-form'
-import { api } from '@/api/axios.ts'
+import { api, imageApi } from '@/api/axios.ts'
 import { useRef, useState } from 'react'
 
 export default function CarForm() {
@@ -13,15 +13,25 @@ export default function CarForm() {
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     try {
-      ref.current?.reset()
+      const imageResponse = await api.get(`/api/v1/image`)
+      const imageUrl = imageResponse.data
+      const image = data.image[0]
+
+      const uploadResponse = await imageApi.postForm(imageUrl, { file: image })
+      const newImageUrl = uploadResponse.data.result.variants[0]
+      console.log('HERE IS THE IMAGE URL BEING SENT')
+
       const newCarData: CarDataProps = {
         model: data.model,
         brand: data.brand,
         description: data.description,
         year: parseInt(data.year, 10),
+        imageUrl: newImageUrl,
       }
+
       await api.post('/api/v1/car', newCarData)
       setMessage('Car added')
+      ref.current?.reset()
     } catch (error) {
       console.log(error)
       // @ts-ignore
@@ -45,7 +55,13 @@ export default function CarForm() {
             {message}
           </div>
         ) : null}
-        <form ref={ref} onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form
+          ref={ref}
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+          method="post"
+          encType="multipart/form-data"
+        >
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="brand">Brand</Label>
@@ -84,6 +100,10 @@ export default function CarForm() {
               id="description"
               placeholder="Describe the car"
             />
+          </div>
+          <div className="space-y-2 flex flex-col">
+            <Label htmlFor="image">Image</Label>
+            <input {...register('image')} id="image" type="file" />
           </div>
           <Button className="w-full" type="submit">
             Submit

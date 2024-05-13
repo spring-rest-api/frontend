@@ -4,6 +4,7 @@ type CarDataProps = {
   model: string
   year: number
   description: string
+  imageUrl: string
 }
 
 type CarResponse = {
@@ -12,4 +13,5 @@ type CarResponse = {
   model: string
   year: number
   description: string
+  imageUrl: string
 }
